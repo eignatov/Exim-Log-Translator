@@ -1,0 +1,296 @@
+<html>
+<head>
+<script>
+var mode=0;
+
+function clearx()
+{
+        document.getElementById('text').value='Paste an Exim log here.';
+        var i = 0;
+        while (i<=10)
+        {
+        document.getElementById('result'+i).innerHTML='';
+        i++;
+        }
+
+}
+
+
+function proc()
+{
+	var log = document.getElementById('text').value; //snag the value that is in the first text box (the exim log)
+	if (log.indexOf("\n")!=-1)
+	{
+        var patt1=/\n/gi;
+        var numlines = log.match(patt1).length;
+	}
+	else {numlines = 0;}
+		
+        var line = log.split("\n");
+
+        var i = 0;
+        while (i<=numlines)
+          {
+		
+
+
+
+		if (mode == 0)
+		{
+
+
+			if (line[i].indexOf('rejected RCPT')!=-1) 
+			{
+			var datex=log.substr(0,10);
+			var timex=log.substr(11,19);
+			line[i]=line[i].slice(20);
+			line[i]=line[i].replace(/\</g,'&lt;');
+			line[i]=line[i].replace(/\>/g,'&gt;');
+                        line[i]=line[i].replace('H=','<br /><span class="format1"> HOST and IP address: </span>');
+                        line[i]=line[i].replace(' F=','<br /><span class="format1"> The SENDER ADDRESS: </span>');
+			line[i]=line[i].replace('rejected RCPT','<br /><span class="format1">rejected RCPT</span>');
+			line[i]=line[i].replace('is currently not permitted to relay through this server','<br /><span class="format1">is currently not permitted to relay through this server </span><b>Check SMTP authentication, username and password. Also, check MX entries, verify they\'re set to local/remote properly and that a correct MX entry exists. </b>');
+			line[i]=line[i].replace('No Such User Here','<br /><span class="format1">No Such User Here </span> <b>The email address you\'re sending to doesn\'t exist at the destination server.</b>');
+                        line[i]=line[i].replace('Could not complete sender verify','<br /><span class="format1">Could not complete sender verify</span><b> check SMTP authentication, make sure user is set as full email address. check MX entries, verify they\'re set to local/remote properly and that a correct MX entry exists.</b>');
+                        line[i]=line[i].replace('is blacklisted','<br /><span class="format1">is blacklisted</span><b> Your username (email address), domain, IP address or server\'s domain (*.bluehost.com, etc) is blacklisted on the recipient server.</b> ');
+                        line[i]=line[i].replace('Mailbox quota exceeded','<br /><span class="format1">Mailbox quota exceeded </span><b> The recipient\'s mail box is full, so there\'s no room for your message.</b>');
+                        line[i]=line[i].replace('Sender verify failed','<br /><span class="format1">Sender verify failed</span><b> Username, password is incorrect; potentially using the wrong authentication type (plain is required on our servers), user may not exist or could be corrupt.</b>');
+			line[i]=line[i].replace('greylisted','<br /><span class="format1">greylisted</span><b> Check to see if they have Spam Hammer installed. Suggest other options for spam filtering if customer is not accustomed to the delay.'); 
+			}
+
+                        else if (line[i].indexOf('DKIM')!=-1){line[i]="";}
+			
+			else if (line[i].indexOf('<=')!=-1)
+			{
+                        var datex = log.substr(0,10);
+                        var timex = log.substr(11,19);
+                        var eximid = log.substr(20,36);
+                        line[i] = line[i].slice(36);
+                        line[i]=line[i].replace(/\</g,'&lt;');
+                        line[i]=line[i].replace(/\>/g,'&gt;');
+                        line[i]=line[i].replace('Completed','End of Log');
+
+                        	if (line[i].indexOf(' id=')!=-1){var idx = line[i].indexOf(' id='); line[i]=line[i].slice(0,idx);}
+
+                	line[i]=line[i].replace(' &lt;= ','<br /><span class="format1"> Our server RECEIVED a message from: </span>');
+	                line[i]=line[i].replace(' H=','<br /><span class="format1"> With the HOST and IP address: </span>');
+	                line[i]=line[i].replace(' P=','<br /><span class="format1"> Using the PROTOCOL of: </span>');
+	                line[i]=line[i].replace(' S=','<br /><span class="format1"> The SIZE of the message in bytes is: </span>');
+	                line[i]=line[i].replace(' X=','<br /><span class="format1"> The TLS CIPHER is: </span>');
+	                line[i]=line[i].replace(' id=','<br /><span class="format1"> The MESSAGE ID for the incoming message: </span>');
+	                line[i]=line[i].replace(' A=','<br /><span class="format1"> The AUTHENTICATOR NAME with OPTIONAL ID is: </span>');
+	                line[i]=line[i].replace(' U=','<br /><span class="format1"> LOCAL USER or RFC 1413 ID: </span>');
+	                line[i]=line[i].replace(' F=','<br /><span class="format1"> The SENDER ADDRESS: </span>');
+	                line[i]=line[i].replace(' I=','<br /><span class="format1"> The LOCAL INTERFACE used was: </span>');
+	                line[i]=line[i].replace(' R=','<br /><span class="format1"> REFERENCE for local bounce: </span>');
+	                line[i]=line[i].replace(' T=','<br /><span class="format1"> The message SUBJECT or TOPIC of: </span>');
+	                line[i]=line[i].replace(' CV=','<br /><span class="format1"> CERTIFICATE VERIFICATION status: </span>');
+	                line[i]=line[i].replace(' DN=','<br /><span class="format1"> DISTINGUISHED NAME from peer certificate: </span>');
+	                line[i]=line[i].replace(' ST=','<br /><span class="format1"> SHADOW TRANSPORT name: </span>');
+                        line[i]=line[i].replace(' QT=','<br /><span class="format1"> time spent on QUEUE so far: </span>');
+	                line[i]=line[i].replace(' D=','<br /><span class="format1"> duration of "no mail in SMTP session" </span>');
+			}
+
+
+                        else if (line[i].indexOf('DKIM')!=-1){line[i]="";}
+
+
+                	else 
+	                {
+                        var datex = log.substr(0,10);
+                        var timex = log.substr(11,19);
+                        var eximid = log.substr(20,36);
+                        line[i] = line[i].slice(36);
+                        line[i]=line[i].replace(/\</g,'&lt;');
+                        line[i]=line[i].replace(/\>/g,'&gt;');
+                        line[i]=line[i].replace('Completed','End of Log');
+	                line[i]=line[i].replace(' =&gt; ','<br /><span class="format1"> Normal message delivery TO: </span>');
+	                line[i]=line[i].replace(' ** ','<br /><span class="format1"> DELIVERY FAILED; address bounced: </span>');
+	                line[i]=line[i].replace(' == ','<br /><span class="format1"> DELIVERY DEFERRED; temporary problem: </span>');
+	                line[i]=line[i].replace(' -&gt; ','<br /><span class="format1"> Delivery of message also sent TO: </span>');
+	                line[i]=line[i].replace('&lt;&gt;','Message has BOUNCED:');
+	                line[i]=line[i].replace(' C=','<br /><span class="format1"> SMTP CONFIRMATION on delivery: </span>');
+	                line[i]=line[i].replace(' H=','<br /><span class="format1"> With the HOST and IP address: </span>');
+	                line[i]=line[i].replace(' P=','<br /><span class="format1"> The RETURN PATH is: </span>');
+	                line[i]=line[i].replace(' S=','<br /><span class="format1"> The SIZE of the message in bytes is: </span>');
+	                line[i]=line[i].replace(' X=','<br /><span class="format1"> The TLS CIPHER is: </span>');
+	                line[i]=line[i].replace(' id=','<br /><span class="format1"> The message ID is: </span>');
+	                line[i]=line[i].replace(' A=','<br /><span class="format1"> The AUTHENTICATOR NAME with OPTIONAL ID is: </span>');
+	                line[i]=line[i].replace(' U=','<br /><span class="format1"> LOCAL USER or RFC 1413 ID: </span>');
+	                line[i]=line[i].replace(' F=','<br /><span class="format1"> The SENDER ADDRESS: </span>');
+	                line[i]=line[i].replace(' I=','<br /><span class="format1"> The LOCAL INTERFACE used was: </span>');
+	                line[i]=line[i].replace(' R=','<br /><span class="format1"> The ROUTER NAME is: </span>');
+	                line[i]=line[i].replace(' T=','<br /><span class="format1"> The TRANSPORT NAME is: </span>');
+	                line[i]=line[i].replace(' CV=','<br /><span class="format1"> CERTIFICATE VERIFICATION status: </span>');
+	                line[i]=line[i].replace(' DN=','<br /><span class="format1"> DISTINGUISHED NAME from peer certificate: </span>');
+	                line[i]=line[i].replace(' ST=','<br /><span class="format1"> SHADOW TRANSPORT name: </span>');
+			line[i]=line[i].replace(' D=','<br /><span class="format1"> duration of "no mail in SMTP session" </span>');
+			line[i]=line[i].replace(' DT=','<br /><span class="format1"> time taken for a delivery </span>');					
+	                line[i]=line[i].replace(' QT=','<br /><span class="format1"> time spent on QUEUE: </span>');
+                        line[i]=line[i].replace('virtual_user','virtual_user = (BH/HM/FD) address');
+                        line[i]=line[i].replace('virtual_sa_user','virtual_sa_user = (BH/HM/FD) address using SPAM ASSASSIN');
+                        line[i]=line[i].replace('virtual_user_filter','virtual_user_filter = (BH/HM/FD) address using USER LEVEL FILTER');
+                        line[i]=line[i].replace('mainacct_central_user_filter','mainacct_central_user_filter = (BH/HM/FD) address using ACCOUNT LEVEL FILTER');
+                        line[i]=line[i].replace('central_filter','central_filter = (BH/HM/FD) is the central filter maintained by admins (or could be spam assassin) ');
+                        line[i]=line[i].replace('clean_mailproxy','clean_mailproxy = external (AOL, Mac, Mobile ME)');
+                        line[i]=line[i].replace('alt_primaryproxy','alt_primaryproxy = external (Gmail, Hotmail, Yahoo, Comcast, etc.)');
+                        line[i]=line[i].replace('alt_forwardproxy','alt_forwardproxy = external forwarded (Gmail, Hotmail, Yahoo, Comcast, etc.)');
+			line[i]=line[i].replace('dk_remote_smtp_with_return_path','dk_remote_smtp_with_return_path = Outbound email (SMTP) with Domain Key check');
+                        line[i]=line[i].replace('mailman_virtual_router','(BH/HM/FD) to Mailman');
+                        line[i]=line[i].replace('mailman_virtual_transport','BH/HM/FD) to Mailman');
+                        line[i]=line[i].replace('virtual_userdelivery','(BH/HM/FD) delivery to standard account');
+                        line[i]=line[i].replace('virtual_sa_userdelivery','(BH/HM/FD) delivery to standard account using Spam Assassin');
+                        line[i]=line[i].replace('**bypassed**','(BH/HM/FD) delivery dev/null or deleted');
+                        line[i]=line[i].replace('local_delivery','(BH/HM/FD) delivery to account but different email address.');
+//system_aliases
+
+			}      
+                document.getElementById('result'+i).innerHTML=line[i];
+		}
+
+
+
+		if (mode==1)
+		{	
+			line[i]=line[i].replace(/\</g,'&lt;');
+                        line[i]=line[i].replace(/\>/g,'&gt;');
+
+                        if (line[i].indexOf('&lt;=')!=-1)
+                        {
+                	line[i]=line[i].replace(' &lt;= ','<br /><span class="format1"> Our server RECEIVED a message from: </span>');
+	                line[i]=line[i].replace(' H=','<br /><span class="format1"> With the HOST and IP address: </span>');
+	                line[i]=line[i].replace(' P=','<br /><span class="format1"> Using the PROTOCOL of: </span>');
+	                line[i]=line[i].replace(' S=','<br /><span class="format1"> The SIZE of the message in bytes is: </span>');
+	                line[i]=line[i].replace(' X=','<br /><span class="format1"> The TLS CIPHER is: </span>');
+	                line[i]=line[i].replace(' id=','<br /><span class="format1"> The MESSAGE ID for the incoming message: </span>');
+	                line[i]=line[i].replace(' A=','<br /><span class="format1"> The AUTHENTICATOR NAME with OPTIONAL ID is: </span>');
+	                line[i]=line[i].replace(' U=','<br /><span class="format1"> LOCAL USER or RFC 1413 ID: </span>');
+	                line[i]=line[i].replace(' F=','<br /><span class="format1"> The SENDER ADDRESS: </span>');
+	                line[i]=line[i].replace(' I=','<br /><span class="format1"> The LOCAL INTERFACE used was: </span>');
+	                line[i]=line[i].replace(' R=','<br /><span class="format1"> REFERENCE for local bounce: </span>');
+	                line[i]=line[i].replace(' T=','<br /><span class="format1"> The message SUBJECT or TOPIC of: </span>');
+	                line[i]=line[i].replace(' CV=','<br /><span class="format1"> CERTIFICATE VERIFICATION status: </span>');
+	                line[i]=line[i].replace(' DN=','<br /><span class="format1"> DISTINGUISHED NAME from peer certificate: </span>');
+	                line[i]=line[i].replace(' ST=','<br /><span class="format1"> SHADOW TRANSPORT name: </span>');
+			line[i]=line[i].replace(' QT=','<br /><span class="format1"> time spent on QUEUE so far: </span>');
+			line[i]=line[i].replace(' D=','<br /><span class="format1"> duration of "no mail in SMTP session" </span>');
+                        }
+
+                	if (line[i].indexOf('DKIM')!=-1)
+	                {
+	                line[i]=line[i].replace(' s=','<br /><span class="format1"> The Domain Key SELECTOR is:</span>');
+	                line[i]=line[i].replace(' b=','<br /><span class="format1"> The Domain Key DIGITAL SIGNATURE (body and header) is :</span>');
+	                line[i]=line[i].replace(' bh=','<br /><span class="format1"> The Domain Key BODY HASH is:</span>');
+	                line[i]=line[i].replace(' d=','<br /><span class="format1"> The Domain Key SIGNING DOMAIN:</span>');
+	                line[i]=line[i].replace(' c=','<br /><span class="format1"> The CANONICALIZATION ALGORITHM:</span>');
+	                line[i]=line[i].replace(' a=','<br /><span class="format1"> The SIGNING ALGORITHM:</span>');
+	                line[i]=line[i].replace(' t=','<br /><span class="format1"> The SIGNATURE TIMESTAMP:</span>');
+	                }
+			
+
+			else 
+	                {
+	                line[i]=line[i].replace(' =&gt; ','<br /><span class="format1"> Normal message delivery TO: </span>');
+	                line[i]=line[i].replace(' ** ','<br /><span class="format1"> DELIVERY FAILED; address bounced: </span>');
+	                line[i]=line[i].replace(' == ','<br /><span class="format1"> DELIVERY DEFERRED; temporary problem: </span>');
+	                line[i]=line[i].replace(' -&gt; ','<br /><span class="format1"> Delivery of message also sent TO: </span>');
+	                line[i]=line[i].replace('&lt;&gt;','Message has BOUNCED:');
+	                line[i]=line[i].replace(' C=','<br /><span class="format1"> SMTP CONFIRMATION on delivery: </span>');
+	                line[i]=line[i].replace(' H=','<br /><span class="format1"> With the HOST and IP address: </span>');
+	                line[i]=line[i].replace(' P=','<br /><span class="format1"> The RETURN PATH is: </span>');
+	                line[i]=line[i].replace(' S=','<br /><span class="format1"> The SIZE of the message in bytes is: </span>');
+	                line[i]=line[i].replace(' X=','<br /><span class="format1"> The TLS CIPHER is: </span>');
+	                line[i]=line[i].replace(' id=','<br /><span class="format1"> The message ID is: </span>');
+	                line[i]=line[i].replace(' A=','<br /><span class="format1"> The AUTHENTICATOR NAME with OPTIONAL ID is: </span>');
+	                line[i]=line[i].replace(' U=','<br /><span class="format1"> LOCAL USER or RFC 1413 ID: </span>');
+	                line[i]=line[i].replace(' F=','<br /><span class="format1"> The SENDER ADDRESS: </span>');
+	                line[i]=line[i].replace(' I=','<br /><span class="format1"> The LOCAL INTERFACE used was: </span>');
+	                line[i]=line[i].replace(' R=','<br /><span class="format1"> The ROUTER NAME is: </span>');
+	                line[i]=line[i].replace(' T=','<br /><span class="format1"> The TRANSPORT NAME is: </span>');
+	                line[i]=line[i].replace(' CV=','<br /><span class="format1"> CERTIFICATE VERIFICATION status: </span>');
+	                line[i]=line[i].replace(' DN=','<br /><span class="format1"> DISTINGUISHED NAME from peer certificate: </span>');
+	                line[i]=line[i].replace(' ST=','<br /><span class="format1"> SHADOW TRANSPORT name: </span>');
+			line[i]=line[i].replace(' D=','<br /><span class="format1"> duration of "no mail in SMTP session" </span>')
+			line[i]=line[i].replace(' DT=','<br /><span class="format1"> time taken for a delivery </span>');					
+	                line[i]=line[i].replace(' QT=','<br /><span class="format1"> time spent on QUEUE: </span>');
+			}
+                document.getElementById('result'+i).innerHTML=line[i];
+                }     
+	  i++;
+	  } 
+}
+
+		
+		
+
+	/*	
+                if (line[i].indexOf('original recipients ignored (system filter)')
+                {
+                
+                }
+2011-09-21 17:02:52 1R6Voa-0002iP-7O <= arquitectura-bounces@jmapc.com H=localhost (box301.bluehost.com) [127.0.0.1] P=esmtp S=5003 id=20110921200243.7CB4760425BDD078@yahoo.com.ar
+2011-09-21 17:02:52 1R6Voa-0002iP-7O => marcelomastropietro@gmail.com <mdm@jmapc.com> R=alt_forwardproxy T=dk_remote_smtp_with_return_path H=74.220.195.23 [74.220.195.23] C="250 ok 1316646172 qp 24949 sfproxy1.bluehost.com"
+2011-09-21 17:02:52 1R6Voa-0002iP-7O -> jmarchitects@gmail.com <jm@jmapc.com> R=alt_forwardproxy T=dk_remote_smtp_with_return_path H=74.220.195.23 [74.220.195.23] C="250 ok 1316646172 qp 24949 sfproxy1.bluehost.com"
+2011-09-21 17:02:52 1R6Voa-0002iP-7O Completed 
+*/
+</script>
+<style type="text/css">
+body {
+	font-size:15px;
+	color:red;
+	font-weight:bold;
+}
+.format1 {
+	font-size:10px;
+	color:black;
+	font-weight:normal;
+}
+div {
+	padding:10px;
+}
+#buttondiv {
+}
+#headercont {
+	display:none;
+}
+</style>
+</head>
+<body>
+<button onClick="document.getElementById('eximcont').style.display='block'; document.getElementById('headercont').style.display='none';">Exim Log</button>
+<button onClick="document.getElementById('eximcont').style.display='none'; document.getElementById('headercont').style.display='block';">Email Header</button>
+<div id="eximcont">
+  <table width="100%">
+    <tr>
+      <td align="center"><textarea id="text" rows="10" cols="130">Paste an Exim log here.</textarea></td>
+    </tr>
+  </table>
+  <div id="buttondiv">
+    <table width="1061px" border="0" align="center">
+      <tr>
+        <td><button onClick="mode = 0; proc();">Basic Translate</button>
+          <button onClick="mode = 1; proc();">Advanced Translate</button></td>
+        <td align="right"><button onClick="clearx();">Reset</button></td>
+      </tr>
+    </table>
+  </div>
+  <table width="1061px" border="0" align="center">
+    <tr>
+      <td><div id="result0" style="width:100%"> </div>
+        <div id="result1" style="width:100%"> </div>
+        <div id="result2" style="width:100%"> </div>
+        <div id="result3" style="width:100%"> </div>
+        <div id="result4" style="width:100%"> </div>
+        <div id="result5" style="width:100%"> </div>
+        <div id="result6" style="width:100%"> </div>
+        <div id="result7" style="width:100%"> </div>
+        <div id="result8" style="width:100%"> </div>
+        <div id="result9" style="width:100%"> </div>
+        <div id="result10" style="width:100%"> </div></td>
+    </tr>
+  </table>
+</div>
+<div id="headercont">
+  <iframe src="http://mxtoolbox.com/EmailHeaders.aspx" width="100%" height="90%"></iframe>
+</div>
+</body>
+</html>
